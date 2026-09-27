@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! ❤️</title>
+
+    <style>
+        /* ==================== GLOBAL STYLES ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f7ebe8;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* ==================== LOCK SCREEN ==================== */
+        #lock-screen {
+            background-color: #c94c4c;
+            color: white;
+            padding: 20px;
+        }
+
+        .lock-container {
+            display: flex;
+            gap: 50px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            max-width: 900px;
+        }
+
+        .polaroid {
+            background: white;
+            padding: 15px 15px 30px 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transform: rotate(-4deg);
+            color: #333;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        .polaroid img {
+            width: 230px;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        .polaroid .caption {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        .pin-box {
+            text-align: center;
+        }
+
+        .pin-box h3 {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .pin-dots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .dot {
+            width: 15px;
+            height: 15px;
+            border: 2px solid white;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .dot.filled {
+            background-color: white;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 65px);
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .keypad button {
+            height: 65px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .keypad button:active {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .keypad button.empty {
+            border: none;
+            background: transparent;
+            pointer-events: none;
+        }
+
+        /* ==================== LOADING SCREEN ==================== */
+        #loading-screen {
+            background-color: #fff0f3;
+            color: #4a4a4a;
+            text-align: center;
+        }
+
+        .loader-content h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0,0,0,0.1);
+            border-top-color: #c94c4c;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==================== SURPRISE SCREEN ==================== */
+        #surprise-screen {
+            background: #fdf5f5;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .main-container {
+            z-index: 2;
+            max-width: 600px;
+        }
+
+        .main-container h1 {
+            color: #c94c4c;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+        }
+
+        /* Envelope / Letter Section */
+        .envelope-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border: 2px dashed #ffb6c1;
+            margin-bottom: 40px;
+            text-align: left;
+            line-height: 1.6;
+            color: #4a4a4a;
+        }
+
+        .envelope-container h3 {
+            color: #c94c4c;
+            margin-bottom: 12px;
+        }
+
+        /* Cake Section */
+        .cake-container h2 {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .cake {
+            width: 160px;
+            height: 100px;
+            background: #f8c291;
+            margin: 40px auto 0 auto;
+            position: relative;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            box-shadow: inset 0 -10px 0 #e15f41;
+        }
+
+        .frosting {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 25px;
+            background: #f8a5c2;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .candles {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+
+        .candle-line {
+            width: 8px;
+            height: 25px;
+            background: #63cdda;
+            position: relative;
+        }
+
+        .candle-line::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 1px;
+            width: 6px;
+            height: 10px;
+            background: #f5cd79;
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 8px #f5cd79;
+            transition: opacity 0.3s;
+        }
+
+        /* Extinguish candles */
+        .cake.blown .candle-line::before {
+            opacity: 0;
+        }
+
+        /* Fireworks Canvas */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SECTION 1: PIN LOCK SCREEN -->
+    <div id="lock-screen" class="screen active">
+        <div class="lock-container">
+            <div class="polaroid">
+                <!-- Replace with her image URL or a local image path -->
+                <img src="your_image3.jpg.jpeg" alt="Birthday Image">
+                <p class="caption">Happy Birthday, Babe ❤️</p>
+            </div>
+            <div class="pin-box">
+                <h3>ENTER A PASSCODE</h3>
+                <div class="pin-dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <div class="keypad">
+                    <button onclick="pressKey(1)">1</button>
+                    <button onclick="pressKey(2)">2</button>
+                    <button onclick="pressKey(3)">3</button>
+                    <button onclick="pressKey(4)">4</button>
+                    <button onclick="pressKey(5)">5</button>
+                    <button onclick="pressKey(6)">6</button>
+                    <button onclick="pressKey(7)">7</button>
+                    <button onclick="pressKey(8)">8</button>
+                    <button onclick="pressKey(9)">9</button>
+                    <button class="empty"></button>
+                    <button onclick="pressKey(0)">0</button>
+                    <button onclick="clearPin()">⌫</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 2: LOADING SCREEN -->
+    <div id="loading-screen" class="screen">
+        <div class="loader-content">
+            <h2>Hey you! ✨</h2>
+            <div class="spinner"></div>
+            <p>Loading your birthday surprise...</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: THE MAIN SURPRISE & CAKE -->
+    <div id="surprise-screen" class="screen">
+        <div class="main-container">
+            <h1>Happy Birthday, Baby! 🎂</h1>
+            
+            <div class="envelope-container">
+                <h3>Dear Zaitun,</h3>
+                <p>I built this little corner of the internet just for you. Happy birthday! I hope your day is filled with endless happiness, love, and all the sweet things you deserve.</p>
+                <br>
+                <p>Thank you for being you. ❤️</p>
+            </div>
+
+            <div class="cake-container">
+                <h2 id="cake-instruction">✨ Make a wish & tap the cake to blow out the candles! ✨</h2>
+                <div class="cake" onclick="blowCandles()">
+                    <div class="candles">
+                        <div class="candle-line"></div>
+                        <div class="candle-line"></div>
+                        <div class="candle-line"></div>
+                    </div>
+                    <div class="frosting"></div>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="fireworksCanvas"></canvas>
+    </div>
+
+    <script>
+        // ==================== PIN LOGIC ====================
+        const CORRECT_PIN = "0101"; // Change to your date/passcode
+        let currentPin = "";
+
+        function pressKey(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updateDots();
+            }
+            if (currentPin.length === 4) {
+                setTimeout(checkPin, 300);
+            }
+        }
+
+        function clearPin() {
+            currentPin = currentPin.slice(0, -1);
+            updateDots();
+        }
+
+        function updateDots() {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((dot, index) => {
+                if (index < currentPin.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            });
+        }
+
+        function checkPin() {
+            if (currentPin === CORRECT_PIN) {
+                switchScreen('lock-screen', 'loading-screen');
+                setTimeout(() => {
+                    switchScreen('loading-screen', 'surprise-screen');
+                }, 2500);
+            } else {
+                alert("Wrong code! Try a special date 😉");
+                clearPin();
+            }
+        }
+
+        function switchScreen(hideId, showId) {
+            document.getElementById(hideId).classList.remove('active');
+            document.getElementById(showId).classList.add('active');
+        }
+
+        // ==================== CAKE & FIREWORKS ====================
+        function blowCandles() {
+            const cake = document.querySelector('.cake');
+            if (!cake.classList.contains('blown')) {
+                cake.classList.add('blown');
+                document.getElementById('cake-instruction').textContent = "🎉 Happy Birthday! Make your wish come true! 🎉";
+                startFireworks();
+            }
+        }
+
+        function startFireworks() {
+            const canvas = document.getElementById('fireworksCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let particles = [];
+
+            class Particle {
+                constructor(x, y, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.color = color;
+                    this.radius = Math.random() * 3 + 1;
+                    this.velocity = {
+                        x: (Math.random() - 0.5) * 8,
+                        y: (Math.random() - 0.5) * 8
+                    };
+                    this.alpha = 1;
+                }
+
+                draw() {
+                    ctx.save();
+                    ctx.globalAlpha = this.alpha;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                update() {
+                    this.x += this.velocity.x;
+                    this.y += this.velocity.y;
+                    this.velocity.y += 0.05;
+                    this.alpha -= 0.01;
+                }
+            }
+
+            function spawnExplosion() {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * (canvas.height * 0.6);
+                const colors = ['#ff7675', '#fdcb6e', '#00cec9', '#6c5ce7', '#e84393'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+                for (let i = 0; i < 40; i++) {
+                    particles.push(new Particle(x, y, randomColor));
+                }
+            }
+
+            const interval = setInterval(spawnExplosion, 500);
+            setTimeout(() => clearInterval(interval), 8000);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach((particle, index) => {
+                    if (particle.alpha <= 0) {
+                        particles.splice(index, 1);
+                    } else {
+                        particle.update();
+                        particle.draw();
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+    </script>
+</body>
+</html>
